@@ -1,31 +1,27 @@
 # AI Expander
 
-A Python module for semantically expanding search terms using NLP and custom mappings. This module is particularly useful for web scraping applications where you want to improve search result relevance by including synonyms and related terms.
+[![Python Version](https://img.shields.io/badge/python-3.7%2B-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+A Python module for semantic expansion of search terms using OpenAI's embeddings. This package helps improve search relevance by expanding queries with synonyms and semantically similar terms.
 
 ## Features
 
-- **Semantic Expansion**: Uses spaCy's word vectors to find semantically similar terms
-- **Custom Mappings**: Easily add your own term mappings
-- **Location-Aware**: Built-in support for common location-based expansions
-- **Case Insensitive**: Handles case variations automatically
-- **Extensible**: Simple API for adding new expansion rules
+- **Semantic Expansion**: Uses OpenAI's embeddings to find semantically similar terms
+- **Custom Synonyms**: Built-in support for location-based synonyms and custom term mappings
+- **Easy Integration**: Simple API that can be easily integrated into existing projects
+- **Configurable**: Adjust similarity thresholds and models to suit your needs
 
 ## Installation
 
-1. Clone this repository:
+1. Install the package using pip:
    ```bash
-   git clone https://github.com/yourusername/ai_expander.git
-   cd ai_expander
+   pip install git+https://github.com/yourusername/ai_expander.git
    ```
 
-2. Install the package in development mode:
+2. Set your OpenAI API key as an environment variable:
    ```bash
-   pip install -e .
-   ```
-
-3. Install the required spaCy model:
-   ```bash
-   python -m spacy download en_core_web_md
+   export OPENAI_API_KEY='your-api-key-here'
    ```
 
 ## Quick Start
@@ -33,44 +29,65 @@ A Python module for semantically expanding search terms using NLP and custom map
 ```python
 from ai_expander import SemanticExpander
 
-# Create an instance
-# You can optionally pass custom mappings
+# Initialize the expander
 expander = SemanticExpander()
 
-# Expand a term
-expanded_terms = expander.expand("NYC")
-print(expanded_terms)
-# Output might include: {'New York', 'New York City', 'NYC', 'The Big Apple'}
+# Expand a single term
+expanded = expander.expand_terms("NYC")
+print(expanded)
+# Output: ['new york', 'new york city', 'nyc', 'the big apple']
 
-# Add custom mappings
-expander.add_mapping("austin", ["ATX", "Live Music Capital"])
-print(expander.expand("austin"))
-# Output: {'austin', 'ATX', 'Live Music Capital'}
+# Add custom synonyms
+custom_synonyms = {
+    "beach": ["seaside", "shore"],
+    "vacation": ["holiday"]
+}
+expander.add_synonyms(custom_synonyms)
+
+# Expand multiple terms
+expanded = expander.expand_terms(["beach vacation"])
+print(expanded)
+# Output: ['beach', 'holiday', 'seaside', 'shore', 'vacation']
 ```
 
-## API Reference
+## Documentation
 
-### SemanticExpander
+### SemanticExpander Class
 
-#### `__init__(self, custom_mapping: Optional[Dict[str, List[str]]] = None)`
-Initialize the SemanticExpander with optional custom mappings.
+#### Initialization
 
-#### `expand(self, term: str, include_original: bool = True) -> Set[str]`
-Expand a search term into a set of related terms.
-
-#### `add_mapping(self, term: str, expansions: List[str])`
-Add or update a term mapping.
-
-#### `get_mapping(self, term: str) -> List[str]`
-Get the expansions for a given term.
-
-## Running Tests
-
-```bash
-python -m unittest ai_expander/test_expander.py
+```python
+expander = SemanticExpander(
+    api_key=None,               # Optional: Your OpenAI API key
+    model="text-embedding-3-small",  # The OpenAI model to use
+    similarity_threshold=0.75,   # Minimum similarity score (0-1)
+    custom_synonyms=None        # Optional: Dictionary of custom synonyms
+)
 ```
+
+#### Methods
+
+- `add_synonyms(synonyms)`: Add custom synonyms to the expander
+- `expand_term(term)`: Expand a single term
+- `expand_terms(terms)`: Expand a list of terms
+
+### Configuration
+
+The module comes with default configurations in `config.py`, including:
+
+- Default model: `text-embedding-3-small`
+- Default similarity threshold: `0.75`
+- Predefined location-based synonyms (e.g., "NYC" → ["New York", "New York City"])
+- Common travel-related terms
+
+## Examples
+
+See the [example.py](example.py) file for more usage examples.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-MIT
-
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
